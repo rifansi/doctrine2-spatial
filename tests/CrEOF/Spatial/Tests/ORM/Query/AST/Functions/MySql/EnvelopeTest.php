@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015 Derek J. Lambert
+ * Copyright (C) 2012 Derek J. Lambert
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +21,13 @@
  * SOFTWARE.
  */
 
-namespace CrEOF\Spatial\Tests\ORM\Query\AST\Functions\MySql;
+namespace CrEOF\Spatial\Tests\ORM\Functions\MySql;
 
 use CrEOF\Spatial\PHP\Types\Geometry\LineString;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use CrEOF\Spatial\PHP\Types\Geometry\Polygon;
 use CrEOF\Spatial\Tests\Fixtures\PolygonEntity;
-use CrEOF\Spatial\Tests\OrmTestCase;
+use CrEOF\Spatial\Tests\OrmTest;
 use Doctrine\ORM\Query;
 
 /**
@@ -36,15 +36,14 @@ use Doctrine\ORM\Query;
  * @author  Derek J. Lambert <dlambert@dereklambert.com>
  * @license http://dlambert.mit-license.org MIT
  *
+ * @group mysql
  * @group dql
  */
-class EnvelopeTest extends OrmTestCase
+class EnvelopeTest extends OrmTest
 {
     protected function setUp()
     {
-        $this->usesEntity(self::POLYGON_ENTITY);
-        $this->supportsPlatform('mysql');
-
+        $this->useEntity('polygon');
         parent::setUp();
     }
 
@@ -65,7 +64,7 @@ class EnvelopeTest extends OrmTestCase
         );
 
         $entity1->setPolygon(new Polygon($rings1));
-        $this->getEntityManager()->persist($entity1);
+        $this->_em->persist($entity1);
 
         $entity2 = new PolygonEntity();
         $rings2 = array(
@@ -86,11 +85,11 @@ class EnvelopeTest extends OrmTestCase
         );
 
         $entity2->setPolygon(new Polygon($rings2));
-        $this->getEntityManager()->persist($entity2);
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
+        $this->_em->persist($entity2);
+        $this->_em->flush();
+        $this->_em->clear();
 
-        $query  = $this->getEntityManager()->createQuery('SELECT AsText(Envelope(p.polygon)) FROM CrEOF\Spatial\Tests\Fixtures\PolygonEntity p');
+        $query  = $this->_em->createQuery('SELECT AsText(Envelope(p.polygon)) FROM CrEOF\Spatial\Tests\Fixtures\PolygonEntity p');
         $result = $query->getResult();
 
         $this->assertEquals('POLYGON((0 0,10 0,10 10,0 10,0 0))', $result[0][1]);
@@ -121,7 +120,7 @@ class EnvelopeTest extends OrmTestCase
         );
 
         $entity1->setPolygon(new Polygon($rings1));
-        $this->getEntityManager()->persist($entity1);
+        $this->_em->persist($entity1);
 
         $entity2 = new PolygonEntity();
         $rings2 = array(
@@ -135,13 +134,22 @@ class EnvelopeTest extends OrmTestCase
         );
 
         $entity2->setPolygon(new Polygon($rings2));
-        $this->getEntityManager()->persist($entity2);
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
+        $this->_em->persist($entity2);
+        $this->_em->flush();
+        $this->_em->clear();
 
-        $query  = $this->getEntityManager()->createQuery('SELECT p FROM CrEOF\Spatial\Tests\Fixtures\PolygonEntity p WHERE Envelope(p.polygon) = GeomFromText(:p1)');
+        $query        = $this->_em->createQuery('SELECT p FROM CrEOF\Spatial\Tests\Fixtures\PolygonEntity p WHERE Envelope(p.polygon) = GeomFromText(:p1)');
+        $envelopeRing = new LineString(array(
+                new Point(0, 0),
+                new Point(10, 0),
+                new Point(10, 10),
+                new Point(0, 10),
+                new Point(0, 0)
+            )
+        );
+        $envelope = new Polygon(array($envelopeRing));
 
-        $query->setParameter('p1', 'POLYGON((0 0,10 0,10 10,0 10,0 0))', 'string');
+        $query->setParameter('p1', $envelope, 'polygon');
 
         $result = $query->getResult();
 

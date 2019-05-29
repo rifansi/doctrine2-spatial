@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015 Derek J. Lambert
+ * Copyright (C) 2012 Derek J. Lambert
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,12 @@
  * SOFTWARE.
  */
 
-namespace CrEOF\Spatial\Tests\ORM\Query\AST\Functions\MySql;
+namespace CrEOF\Spatial\Tests\ORM\Functions\MySql;
 
 use CrEOF\Spatial\PHP\Types\Geometry\LineString;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use CrEOF\Spatial\Tests\Fixtures\GeometryEntity;
-use CrEOF\Spatial\Tests\OrmTestCase;
+use CrEOF\Spatial\Tests\OrmTest;
 use Doctrine\ORM\Query;
 
 /**
@@ -35,16 +35,15 @@ use Doctrine\ORM\Query;
  * @author  Derek J. Lambert <dlambert@dereklambert.com>
  * @license http://dlambert.mit-license.org MIT
  *
+ * @group mysql
  * @group dql
  */
-class GeomFromTextTest extends OrmTestCase
+class GeomFromTextTest extends OrmTest
 {
     protected function setUp()
     {
-        $this->usesEntity(self::GEOMETRY_ENTITY);
-        $this->usesType('point');
-        $this->supportsPlatform('mysql');
-
+        $this->useEntity('geometry');
+        $this->useType('point');
         parent::setUp();
     }
 
@@ -56,13 +55,13 @@ class GeomFromTextTest extends OrmTestCase
         $entity1 = new GeometryEntity();
 
         $entity1->setGeometry(new Point(5, 5));
-        $this->getEntityManager()->persist($entity1);
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
+        $this->_em->persist($entity1);
+        $this->_em->flush();
+        $this->_em->clear();
 
-        $query  = $this->getEntityManager()->createQuery('SELECT g FROM CrEOF\Spatial\Tests\Fixtures\GeometryEntity g WHERE g.geometry = GeomFromText(:p1)');
+        $query = $this->_em->createQuery('SELECT g FROM CrEOF\Spatial\Tests\Fixtures\GeometryEntity g WHERE g.geometry = GeomFromText(:geometry)');
 
-        $query->setParameter('p1', 'POINT(5 5)', 'string');
+        $query->setParameter('geometry', new Point(5, 5), 'point');
 
         $result = $query->getResult();
 
@@ -84,13 +83,13 @@ class GeomFromTextTest extends OrmTestCase
         $entity1 = new GeometryEntity();
 
         $entity1->setGeometry(new LineString($value));
-        $this->getEntityManager()->persist($entity1);
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
+        $this->_em->persist($entity1);
+        $this->_em->flush();
+        $this->_em->clear();
 
-        $query = $this->getEntityManager()->createQuery('SELECT g FROM CrEOF\Spatial\Tests\Fixtures\GeometryEntity g WHERE g.geometry = GeomFromText(:p1)');
+        $query = $this->_em->createQuery('SELECT g FROM CrEOF\Spatial\Tests\Fixtures\GeometryEntity g WHERE g.geometry = GeomFromText(:geometry)');
 
-        $query->setParameter('p1', 'LINESTRING(0 0,5 5,10 10)', 'string');
+        $query->setParameter('geometry', new LineString($value), 'linestring');
 
         $result = $query->getResult();
 

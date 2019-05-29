@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015 Derek J. Lambert
+ * Copyright (C) 2012 Derek J. Lambert
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +21,13 @@
  * SOFTWARE.
  */
 
-namespace CrEOF\Spatial\Tests\ORM\Query\AST\Functions\PostgreSql;
+namespace CrEOF\Spatial\Tests\ORM\Functions\PostgreSql;
 
 use CrEOF\Spatial\PHP\Types\Geometry\LineString;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use CrEOF\Spatial\PHP\Types\Geometry\Polygon;
 use CrEOF\Spatial\Tests\Fixtures\PolygonEntity;
-use CrEOF\Spatial\Tests\OrmTestCase;
+use CrEOF\Spatial\Tests\OrmTest;
 use Doctrine\ORM\Query;
 
 /**
@@ -36,16 +36,15 @@ use Doctrine\ORM\Query;
  * @author  Derek J. Lambert <dlambert@dereklambert.com>
  * @license http://dlambert.mit-license.org MIT
  *
+ * @group postgresql
  * @group dql
  */
-class STClosestPointTest extends OrmTestCase
+class STClosestPointTest extends OrmTest
 {
     protected function setUp()
     {
-        $this->usesEntity(self::POLYGON_ENTITY);
-        $this->usesType('point');
-        $this->supportsPlatform('postgresql');
-
+        $this->useEntity('polygon');
+        $this->useType('point');
         parent::setUp();
     }
 
@@ -71,18 +70,18 @@ class STClosestPointTest extends OrmTestCase
         $entity1 = new PolygonEntity();
 
         $entity1->setPolygon(new Polygon(array($ring1)));
-        $this->getEntityManager()->persist($entity1);
+        $this->_em->persist($entity1);
 
         $entity2 = new PolygonEntity();
 
         $entity2->setPolygon(new Polygon(array($ring2)));
-        $this->getEntityManager()->persist($entity2);
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
+        $this->_em->persist($entity2);
+        $this->_em->flush();
+        $this->_em->clear();
 
-        $query  = $this->getEntityManager()->createQuery('SELECT p, ST_AsText(ST_ClosestPoint(p.polygon, ST_GeomFromText(:p1))) FROM CrEOF\Spatial\Tests\Fixtures\PolygonEntity p');
+        $query = $this->_em->createQuery('SELECT p, ST_AsText(ST_ClosestPoint(p.polygon, ST_GeomFromText(:p1))) FROM CrEOF\Spatial\Tests\Fixtures\PolygonEntity p');
 
-        $query->setParameter('p1', 'POINT(2 2)', 'string');
+        $query->setParameter('p1', new Point(2, 2), 'point');
 
         $result = $query->getResult();
 

@@ -131,55 +131,6 @@ class MultiLineStringTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $multiLineString->getLineStrings());
     }
 
-
-
-    public function testSolidMultiLineStringAddRings()
-    {
-        $expected = array(
-            new LineString(
-                array(
-                    new Point(0, 0),
-                    new Point(10, 0),
-                    new Point(10, 10),
-                    new Point(0, 10),
-                    new Point(0, 0)
-                )
-            ),
-            new LineString(
-                array(
-                    new Point(0, 0),
-                    new Point(10, 0),
-                    new Point(10, 10),
-                    new Point(0, 10),
-                    new Point(0, 0)
-                )
-            )
-        );
-        $rings = array(
-            array(
-                array(0, 0),
-                array(10, 0),
-                array(10, 10),
-                array(0, 10),
-                array(0, 0)
-            ),
-        );
-
-        $multiLineString = new MultiLineString($rings);
-
-        $multiLineString->addLineString(
-            array(
-                array(0, 0),
-                array(10, 0),
-                array(10, 10),
-                array(0, 10),
-                array(0, 0)
-            )
-        );
-
-        $this->assertEquals($expected, $multiLineString->getLineStrings());
-    }
-
     public function testMultiLineStringFromObjectsGetSingleLineString()
     {
         $lineString1 = new LineString(
@@ -253,29 +204,5 @@ class MultiLineStringTest extends \PHPUnit_Framework_TestCase
         $result  = (string) $multiLineString;
 
         $this->assertEquals($expected, $result);
-    }
-
-    public function testJson()
-    {
-        $expected = '{"type":"MultiLineString","coordinates":[[[0,0],[10,0],[10,10],[0,10],[0,0]],[[0,0],[10,0],[10,10],[0,10],[0,0]]]}';
-        $lineStrings = array(
-            array(
-                array(0, 0),
-                array(10, 0),
-                array(10, 10),
-                array(0, 10),
-                array(0, 0)
-            ),
-            array(
-                array(0, 0),
-                array(10, 0),
-                array(10, 10),
-                array(0, 10),
-                array(0, 0)
-            )
-        );
-        $multiLineString = new MultiLineString($lineStrings);
-
-        $this->assertEquals($expected, $multiLineString->toJson());
     }
 }

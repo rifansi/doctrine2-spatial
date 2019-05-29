@@ -26,7 +26,7 @@ namespace CrEOF\Spatial\PHP\Types\Geometry;
 use CrEOF\Spatial\PHP\Types\AbstractMultiPolygon;
 
 /**
- * MultiPolygon object for MULTIPOLYGON geometry type
+ * Polygon object for MULTIPOLYGON geometry type
  *
  * @author  Derek J. Lambert <dlambert@dereklambert.com>
  * @license http://dlambert.mit-license.org MIT

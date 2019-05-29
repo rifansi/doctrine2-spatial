@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015 Derek J. Lambert
+ * Copyright (C) 2012 Derek J. Lambert
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,9 @@
 
 namespace CrEOF\Spatial\PHP\Types;
 
+use CrEOF\Spatial\Exception\InvalidValueException;
+use CrEOF\Spatial\PHP\Types\AbstractPoint;
+
 /**
  * Abstract Polygon object for POLYGON spatial types
  *
@@ -32,12 +35,12 @@ namespace CrEOF\Spatial\PHP\Types;
 abstract class AbstractMultiPolygon extends AbstractGeometry
 {
     /**
-     * @var array[] $polygons
+     * @var array[] $rings
      */
     protected $polygons = array();
 
     /**
-     * @param AbstractPolygon[]|array[] $polygons
+     * @param AbstractLineString[]|array[] $rings
      * @param null|int                     $srid
      */
     public function __construct(array $polygons, $srid = null)
@@ -47,7 +50,7 @@ abstract class AbstractMultiPolygon extends AbstractGeometry
     }
 
     /**
-     * @param AbstractPolygon|array[] $polygon
+     * @param AbstractLineString|array[] $polygon
      *
      * @return self
      */
@@ -59,7 +62,7 @@ abstract class AbstractMultiPolygon extends AbstractGeometry
     }
 
     /**
-     * @return AbstractPolygon[]
+     * @return AbstractLineString[]
      */
     public function getPolygons()
     {
@@ -75,7 +78,7 @@ abstract class AbstractMultiPolygon extends AbstractGeometry
     /**
      * @param int $index
      *
-     * @return AbstractPolygon
+     * @return AbstractLineString
      */
     public function getPolygon($index)
     {
@@ -83,13 +86,13 @@ abstract class AbstractMultiPolygon extends AbstractGeometry
             $index = count($this->polygons) - 1;
         }
 
-        $polygonClass = $this->getNamespace() . '\Polygon';
+        $lineStringClass = $this->getNamespace() . '\Polygon';
 
-        return new $polygonClass($this->polygons[$index], $this->srid);
+        return new $lineStringClass($this->polygons[$index], $this->srid);
     }
 
     /**
-     * @param AbstractPolygon[] $polygons
+     * @param AbstractLineString[] $rings
      *
      * @return self
      */

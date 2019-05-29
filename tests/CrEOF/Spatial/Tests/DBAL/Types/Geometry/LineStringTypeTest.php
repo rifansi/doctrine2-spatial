@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015 Derek J. Lambert
+ * Copyright (C) 2012 Derek J. Lambert
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ namespace CrEOF\Spatial\Tests\DBAL\Types\Geometry;
 use Doctrine\ORM\Query;
 use CrEOF\Spatial\PHP\Types\Geometry\LineString;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
-use CrEOF\Spatial\Tests\OrmTestCase;
+use CrEOF\Spatial\Tests\OrmTest;
 use CrEOF\Spatial\Tests\Fixtures\LineStringEntity;
 
 /**
@@ -37,11 +37,11 @@ use CrEOF\Spatial\Tests\Fixtures\LineStringEntity;
  *
  * @group geometry
  */
-class LineStringTypeTest extends OrmTestCase
+class LineStringTypeTest extends OrmTest
 {
     protected function setUp()
     {
-        $this->usesEntity(self::LINESTRING_ENTITY);
+        $this->useEntity('linestring');
         parent::setUp();
     }
 
@@ -49,14 +49,14 @@ class LineStringTypeTest extends OrmTestCase
     {
         $entity = new LineStringEntity();
 
-        $this->getEntityManager()->persist($entity);
-        $this->getEntityManager()->flush();
+        $this->_em->persist($entity);
+        $this->_em->flush();
 
         $id = $entity->getId();
 
-        $this->getEntityManager()->clear();
+        $this->_em->clear();
 
-        $queryEntity = $this->getEntityManager()->getRepository(self::LINESTRING_ENTITY)->find($id);
+        $queryEntity = $this->_em->getRepository(self::LINESTRING_ENTITY)->find($id);
 
         $this->assertEquals($entity, $queryEntity);
     }
@@ -68,19 +68,18 @@ class LineStringTypeTest extends OrmTestCase
                 new Point(0, 0),
                 new Point(1, 1),
                 new Point(2, 2)
-            )
-        );
+            ));
         $entity = new LineStringEntity();
 
         $entity->setLineString($lineString);
-        $this->getEntityManager()->persist($entity);
-        $this->getEntityManager()->flush();
+        $this->_em->persist($entity);
+        $this->_em->flush();
 
         $id = $entity->getId();
 
-        $this->getEntityManager()->clear();
+        $this->_em->clear();
 
-        $queryEntity = $this->getEntityManager()->getRepository(self::LINESTRING_ENTITY)->find($id);
+        $queryEntity = $this->_em->getRepository(self::LINESTRING_ENTITY)->find($id);
 
         $this->assertEquals($entity, $queryEntity);
     }
@@ -92,17 +91,16 @@ class LineStringTypeTest extends OrmTestCase
                  new Point(0, 0),
                  new Point(1, 1),
                  new Point(2, 2)
-            )
-        );
+            ));
         $entity = new LineStringEntity();
 
         $entity->setLineString($lineString);
-        $this->getEntityManager()->persist($entity);
-        $this->getEntityManager()->flush();
+        $this->_em->persist($entity);
+        $this->_em->flush();
 
-        $this->getEntityManager()->clear();
+        $this->_em->clear();
 
-        $result = $this->getEntityManager()->getRepository(self::LINESTRING_ENTITY)->findByLineString($lineString);
+        $result = $this->_em->getRepository(self::LINESTRING_ENTITY)->findByLineString($lineString);
 
         $this->assertEquals($entity, $result[0]);
     }

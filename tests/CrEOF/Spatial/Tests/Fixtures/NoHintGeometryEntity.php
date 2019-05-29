@@ -30,7 +30,7 @@ namespace CrEOF\Spatial\Tests\Fixtures;
  * @license http://dlambert.mit-license.org MIT
  *
  * @Entity
- * @Table()
+ * @Table(options={"engine"="MyISAM"})
  */
 class NoHintGeometryEntity
 {

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015 Derek J. Lambert
+ * Copyright (C) 2012 Derek J. Lambert
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,10 +23,11 @@
 
 namespace CrEOF\Spatial\Tests\DBAL\Types;
 
+use Doctrine\ORM\Query;
 use CrEOF\Spatial\PHP\Types\Geography\LineString;
 use CrEOF\Spatial\PHP\Types\Geography\Point;
 use CrEOF\Spatial\PHP\Types\Geography\Polygon;
-use CrEOF\Spatial\Tests\OrmTestCase;
+use CrEOF\Spatial\Tests\OrmTest;
 use CrEOF\Spatial\Tests\Fixtures\GeographyEntity;
 
 /**
@@ -37,11 +38,11 @@ use CrEOF\Spatial\Tests\Fixtures\GeographyEntity;
  *
  * @group geography
  */
-class GeographyTypeTest extends OrmTestCase
+class GeographyTypeTest extends OrmTest
 {
     protected function setUp()
     {
-        $this->usesEntity(self::GEOGRAPHY_ENTITY);
+        $this->useEntity('geography');
         parent::setUp();
     }
 
@@ -49,14 +50,14 @@ class GeographyTypeTest extends OrmTestCase
     {
         $entity = new GeographyEntity();
 
-        $this->getEntityManager()->persist($entity);
-        $this->getEntityManager()->flush();
+        $this->_em->persist($entity);
+        $this->_em->flush();
 
         $id = $entity->getId();
 
-        $this->getEntityManager()->clear();
+        $this->_em->clear();
 
-        $queryEntity = $this->getEntityManager()->getRepository(self::GEOGRAPHY_ENTITY)->find($id);
+        $queryEntity = $this->_em->getRepository(self::GEOGRAPHY_ENTITY)->find($id);
 
         $this->assertEquals($entity, $queryEntity);
     }
@@ -66,14 +67,14 @@ class GeographyTypeTest extends OrmTestCase
         $entity = new GeographyEntity();
 
         $entity->setGeography(new Point(1, 1));
-        $this->getEntityManager()->persist($entity);
-        $this->getEntityManager()->flush();
+        $this->_em->persist($entity);
+        $this->_em->flush();
 
         $id = $entity->getId();
 
-        $this->getEntityManager()->clear();
+        $this->_em->clear();
 
-        $queryEntity = $this->getEntityManager()->getRepository(self::GEOGRAPHY_ENTITY)->find($id);
+        $queryEntity = $this->_em->getRepository(self::GEOGRAPHY_ENTITY)->find($id);
 
         $this->assertEquals($entity, $queryEntity);
     }
@@ -88,14 +89,14 @@ class GeographyTypeTest extends OrmTestCase
                  new Point(1, 1)
             ))
         );
-        $this->getEntityManager()->persist($entity);
-        $this->getEntityManager()->flush();
+        $this->_em->persist($entity);
+        $this->_em->flush();
 
         $id = $entity->getId();
 
-        $this->getEntityManager()->clear();
+        $this->_em->clear();
 
-        $queryEntity = $this->getEntityManager()->getRepository(self::GEOGRAPHY_ENTITY)->find($id);
+        $queryEntity = $this->_em->getRepository(self::GEOGRAPHY_ENTITY)->find($id);
 
         $this->assertEquals($entity, $queryEntity);
     }
@@ -115,14 +116,14 @@ class GeographyTypeTest extends OrmTestCase
         );
 
         $entity->setGeography(new Polygon($rings));
-        $this->getEntityManager()->persist($entity);
-        $this->getEntityManager()->flush();
+        $this->_em->persist($entity);
+        $this->_em->flush();
 
         $id = $entity->getId();
 
-        $this->getEntityManager()->clear();
+        $this->_em->clear();
 
-        $queryEntity = $this->getEntityManager()->getRepository(self::GEOGRAPHY_ENTITY)->find($id);
+        $queryEntity = $this->_em->getRepository(self::GEOGRAPHY_ENTITY)->find($id);
 
         $this->assertEquals($entity, $queryEntity);
     }
@@ -134,15 +135,6 @@ class GeographyTypeTest extends OrmTestCase
     {
         $entity = new GeographyEntity();
 
-        try {
-            $entity->setGeography('POINT(0 0)');
-        } catch (\TypeError $exception) {
-            throw new \PHPUnit_Framework_Error(
-                $exception->getMessage(),
-                $exception->getCode(),
-                $exception->getFile(),
-                $exception->getLine()
-            );
-        }
+        $entity->setGeography('POINT(0 0)');
     }
 }

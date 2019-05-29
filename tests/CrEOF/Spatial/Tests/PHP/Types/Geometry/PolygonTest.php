@@ -71,32 +71,6 @@ class PolygonTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $polygon->toArray());
     }
 
-    public function testSolidPolygonFromArrayOfPoints()
-    {
-        $expected = array(
-            array(
-                array(0, 0),
-                array(10, 0),
-                array(10, 10),
-                array(0, 10),
-                array(0, 0)
-            )
-        );
-        $rings = array(
-            array(
-                new Point(0, 0),
-                new Point(10, 0),
-                new Point(10, 10),
-                new Point(0, 10),
-                new Point(0, 0)
-            )
-        );
-
-        $polygon = new Polygon($rings);
-
-        $this->assertEquals($expected, $polygon->toArray());
-    }
-
     public function testSolidPolygonFromArraysGetRings()
     {
         $expected = array(
@@ -121,55 +95,6 @@ class PolygonTest extends \PHPUnit_Framework_TestCase
         );
 
         $polygon = new Polygon($rings);
-
-        $this->assertEquals($expected, $polygon->getRings());
-    }
-
-
-    public function testSolidPolygonFromArrayAddRings()
-    {
-        $expected = array(
-            new LineString(
-                array(
-                    new Point(0, 0),
-                    new Point(10, 0),
-                    new Point(10, 10),
-                    new Point(0, 10),
-                    new Point(0, 0)
-                )
-            ),
-            new LineString(
-                array(
-                    new Point(2, 2),
-                    new Point(10, 0),
-                    new Point(10, 10),
-                    new Point(0, 10),
-                    new Point(2, 2)
-                )
-            )
-        );
-
-        $rings = array(
-            array(
-                array(0, 0),
-                array(10, 0),
-                array(10, 10),
-                array(0, 10),
-                array(0, 0)
-            )
-        );
-
-        $polygon = new Polygon($rings);
-
-        $polygon->addRing(
-            array(
-                array(2, 2),
-                array(10, 0),
-                array(10, 10),
-                array(0, 10),
-                array(2, 2)
-            )
-        );
 
         $this->assertEquals($expected, $polygon->getRings());
     }
@@ -264,32 +189,8 @@ class PolygonTest extends \PHPUnit_Framework_TestCase
             )
         );
         $polygon = new Polygon($rings);
-        $result = (string)$polygon;
+        $result  = (string) $polygon;
 
         $this->assertEquals($expected, $result);
-    }
-
-    public function testJson()
-    {
-        $expected = '{"type":"Polygon","coordinates":[[[0,0],[10,0],[10,10],[0,10],[0,0]],[[0,0],[10,0],[10,10],[0,10],[0,0]]]}';
-        $rings = array(
-            array(
-                array(0, 0),
-                array(10, 0),
-                array(10, 10),
-                array(0, 10),
-                array(0, 0)
-            ),
-            array(
-                array(0, 0),
-                array(10, 0),
-                array(10, 10),
-                array(0, 10),
-                array(0, 0)
-            )
-        );
-        $polygon = new Polygon($rings);
-
-        $this->assertEquals($expected, $polygon->toJson());
     }
 }

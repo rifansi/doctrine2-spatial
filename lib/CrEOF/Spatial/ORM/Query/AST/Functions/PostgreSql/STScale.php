@@ -23,7 +23,7 @@
 
 namespace CrEOF\Spatial\ORM\Query\AST\Functions\PostgreSql;
 
-use CrEOF\Spatial\ORM\Query\AST\Functions\AbstractSpatialDQLFunction;
+use CrEOF\Spatial\ORM\Query\AST\Functions\AbstractTripleGeometryDQLFunction;
 
 /**
  * ST_Scale DQL function
@@ -31,14 +31,9 @@ use CrEOF\Spatial\ORM\Query\AST\Functions\AbstractSpatialDQLFunction;
  * @author  Tom Vogt <tom@lemuria.org>
  * @license http://mit-license.org MIT
  */
-class STScale extends AbstractSpatialDQLFunction
+class STScale extends AbstractTripleGeometryDQLFunction
 {
     protected $platforms = array('postgresql');
 
     protected $functionName = 'ST_Scale';
-
-    protected $minGeomExpr = 3;
-
-    protected $maxGeomExpr = 3;
-
 }

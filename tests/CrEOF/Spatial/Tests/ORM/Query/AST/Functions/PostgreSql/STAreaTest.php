@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015 Derek J. Lambert
+ * Copyright (C) 2012 Derek J. Lambert
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +21,13 @@
  * SOFTWARE.
  */
 
-namespace CrEOF\Spatial\Tests\ORM\Query\AST\Functions\PostgreSql;
+namespace CrEOF\Spatial\Tests\ORM\Functions\PostgreSql;
 
 use CrEOF\Spatial\PHP\Types\Geometry\LineString;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use CrEOF\Spatial\PHP\Types\Geometry\Polygon;
 use CrEOF\Spatial\Tests\Fixtures\PolygonEntity;
-use CrEOF\Spatial\Tests\OrmTestCase;
+use CrEOF\Spatial\Tests\OrmTest;
 use Doctrine\ORM\Query;
 
 /**
@@ -36,15 +36,14 @@ use Doctrine\ORM\Query;
  * @author  Derek J. Lambert <dlambert@dereklambert.com>
  * @license http://dlambert.mit-license.org MIT
  *
+ * @group postgresql
  * @group dql
  */
-class STAreaTest extends OrmTestCase
+class STAreaTest extends OrmTest
 {
     protected function setUp()
     {
-        $this->usesEntity(self::POLYGON_ENTITY);
-        $this->supportsPlatform('postgresql');
-
+        $this->useEntity('polygon');
         parent::setUp();
     }
 
@@ -65,7 +64,7 @@ class STAreaTest extends OrmTestCase
         );
 
         $entity1->setPolygon(new Polygon($rings1));
-        $this->getEntityManager()->persist($entity1);
+        $this->_em->persist($entity1);
 
         $entity2 = new PolygonEntity();
         $rings2 = array(
@@ -86,7 +85,7 @@ class STAreaTest extends OrmTestCase
         );
 
         $entity2->setPolygon(new Polygon($rings2));
-        $this->getEntityManager()->persist($entity2);
+        $this->_em->persist($entity2);
 
         $entity3 = new PolygonEntity();
         $rings3 = array(
@@ -101,7 +100,7 @@ class STAreaTest extends OrmTestCase
         );
 
         $entity3->setPolygon(new Polygon($rings3));
-        $this->getEntityManager()->persist($entity3);
+        $this->_em->persist($entity3);
 
         $entity4 = new PolygonEntity();
         $rings4 = array(
@@ -115,11 +114,11 @@ class STAreaTest extends OrmTestCase
         );
 
         $entity4->setPolygon(new Polygon($rings4));
-        $this->getEntityManager()->persist($entity4);
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
+        $this->_em->persist($entity4);
+        $this->_em->flush();
+        $this->_em->clear();
 
-        $query  = $this->getEntityManager()->createQuery('SELECT ST_Area(p.polygon) FROM CrEOF\Spatial\Tests\Fixtures\PolygonEntity p');
+        $query  = $this->_em->createQuery('SELECT ST_Area(p.polygon) FROM CrEOF\Spatial\Tests\Fixtures\PolygonEntity p');
         $result = $query->getResult();
 
         $this->assertEquals(100, $result[0][1]);
@@ -131,7 +130,7 @@ class STAreaTest extends OrmTestCase
     /**
      * @group geometry
      */
-    public function testSTAreaWhere()
+    public function testSTAreaWhereParameter()
     {
         $entity1 = new PolygonEntity();
         $rings1 = array(
@@ -145,7 +144,7 @@ class STAreaTest extends OrmTestCase
         );
 
         $entity1->setPolygon(new Polygon($rings1));
-        $this->getEntityManager()->persist($entity1);
+        $this->_em->persist($entity1);
 
         $entity2 = new PolygonEntity();
         $rings2 = array(
@@ -166,7 +165,7 @@ class STAreaTest extends OrmTestCase
         );
 
         $entity2->setPolygon(new Polygon($rings2));
-        $this->getEntityManager()->persist($entity2);
+        $this->_em->persist($entity2);
 
         $entity3 = new PolygonEntity();
         $rings3 = array(
@@ -181,7 +180,7 @@ class STAreaTest extends OrmTestCase
         );
 
         $entity3->setPolygon(new Polygon($rings3));
-        $this->getEntityManager()->persist($entity3);
+        $this->_em->persist($entity3);
 
         $entity4 = new PolygonEntity();
         $rings4 = array(
@@ -195,11 +194,11 @@ class STAreaTest extends OrmTestCase
         );
 
         $entity4->setPolygon(new Polygon($rings4));
-        $this->getEntityManager()->persist($entity4);
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
+        $this->_em->persist($entity4);
+        $this->_em->flush();
+        $this->_em->clear();
 
-        $query  = $this->getEntityManager()->createQuery('SELECT p FROM CrEOF\Spatial\Tests\Fixtures\PolygonEntity p WHERE ST_Area(p.polygon) < 50');
+        $query  = $this->_em->createQuery('SELECT p FROM CrEOF\Spatial\Tests\Fixtures\PolygonEntity p WHERE ST_Area(p.polygon) < 50');
         $result = $query->getResult();
 
         $this->assertCount(1, $result);

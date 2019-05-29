@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015 Derek J. Lambert
+ * Copyright (C) 2012 Derek J. Lambert
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -94,12 +94,19 @@ abstract class AbstractSpatialDQLFunction extends FunctionNode
     {
         $this->validatePlatform($sqlWalker->getConnection()->getDatabasePlatform());
 
-        $arguments = array();
-        foreach ($this->geomExpr as $expression) {
-            $arguments[] = $expression->dispatch($sqlWalker);
+        $result = sprintf(
+            '%s(%s',
+            $this->functionName,
+            $this->geomExpr[0]->dispatch($sqlWalker)
+        );
+
+        for ($i = 1, $size = count($this->geomExpr); $i < $size; $i++) {
+            $result .= ', ' . $this->geomExpr[$i]->dispatch($sqlWalker);
         }
 
-        return sprintf('%s(%s)', $this->functionName, implode(', ', $arguments));
+        $result .= ')';
+
+        return $result;
     }
 
     /**
@@ -111,10 +118,8 @@ abstract class AbstractSpatialDQLFunction extends FunctionNode
     {
         $platformName = $platform->getName();
 
-        if (isset($this->platforms) && !in_array($platformName, $this->platforms)) {
-            throw new UnsupportedPlatformException(
-                sprintf('DBAL platform "%s" is not currently supported.', $platformName)
-            );
+        if (isset($this->platforms) && ! in_array($platformName, $this->platforms)) {
+            throw UnsupportedPlatformException::unsupportedPlatform($platformName);
         }
     }
 }

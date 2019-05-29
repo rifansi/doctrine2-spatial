@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015 Derek J. Lambert
+ * Copyright (C) 2012 Derek J. Lambert
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,22 +35,13 @@ use CrEOF\Spatial\PHP\Types\Geometry\Point;
  */
 class PointTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testGoodNumericPoint()
     {
         $point1 = new Point(-73.7562317, 42.6525793);
 
         $this->assertEquals(42.6525793, $point1->getLatitude());
         $this->assertEquals(-73.7562317, $point1->getLongitude());
-
-        $point1
-            ->setLatitude(40.446111111111)
-            ->setLongitude(-79.948611111111);
-
-        $this->assertEquals(40.446111111111, $point1->getLatitude());
-        $this->assertEquals(-79.948611111111, $point1->getLongitude());
     }
-
 
     public function testGoodStringPoints()
     {
@@ -84,17 +75,17 @@ class PointTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(40.446261944444, $point7->getLatitude());
         $this->assertEquals(-79.948842222222, $point7->getLongitude());
 
-        $point8 = new Point('112:4:0W', '33:27:0N');
+        $point7 = new Point('112:4:0W', '33:27:0N');
 
-        $this->assertEquals(33.45, $point8->getLatitude());
-        $this->assertEquals(-112.06666666667, $point8->getLongitude());
+        $this->assertEquals(33.45, $point7->getLatitude());
+        $this->assertEquals(-112.06666666667, $point7->getLongitude());
     }
 
     /**
      * Test bad string parameters - invalid latitude direction
      *
      * @expectedException        \CrEOF\Spatial\Exception\InvalidValueException
-     * @expectedExceptionMessage [Syntax Error] line 0, col 8: Error: Expected CrEOF\Geo\String\Lexer::T_INTEGER or CrEOF\Geo\String\Lexer::T_FLOAT, got "Q" in value "84:26:46Q"
+     * @expectedExceptionMessage 84:26:46Q is not a valid coordinate value.
      */
     public function testBadLatitudeDirection()
     {
@@ -105,7 +96,7 @@ class PointTest extends \PHPUnit_Framework_TestCase
      * Test bad string parameters - latitude degrees greater that 90
      *
      * @expectedException        \CrEOF\Spatial\Exception\InvalidValueException
-     * @expectedExceptionMessage [Range Error] Error: Degrees out of range -90 to 90 in value "92:26:46N"
+     * @expectedExceptionMessage 92:26:46N is not a valid coordinate value.
      */
     public function testBadLatitudeDegrees()
     {
@@ -116,7 +107,7 @@ class PointTest extends \PHPUnit_Framework_TestCase
      * Test bad string parameters - latitude minutes greater than 59
      *
      * @expectedException        \CrEOF\Spatial\Exception\InvalidValueException
-     * @expectedExceptionMessage [Range Error] Error: Minutes greater than 60 in value "84:64:46N"
+     * @expectedExceptionMessage 84:64:46N is not a valid coordinate value.
      */
     public function testBadLatitudeMinutes()
     {
@@ -127,7 +118,7 @@ class PointTest extends \PHPUnit_Framework_TestCase
      * Test bad string parameters - latitude seconds greater than 59
      *
      * @expectedException        \CrEOF\Spatial\Exception\InvalidValueException
-     * @expectedExceptionMessage [Range Error] Error: Seconds greater than 60 in value "84:23:75N"
+     * @expectedExceptionMessage 84:23:75N is not a valid coordinate value.
      */
     public function testBadLatitudeSeconds()
     {
@@ -138,7 +129,7 @@ class PointTest extends \PHPUnit_Framework_TestCase
      * Test bad string parameters - invalid longitude direction
      *
      * @expectedException        \CrEOF\Spatial\Exception\InvalidValueException
-     * @expectedExceptionMessage [Syntax Error] line 0, col 9: Error: Expected CrEOF\Geo\String\Lexer::T_INTEGER or CrEOF\Geo\String\Lexer::T_FLOAT, got "P" in value "100:56:55P"
+     * @expectedExceptionMessage 100:56:55P is not a valid coordinate value.
      */
     public function testBadLongitudeDirection()
     {
@@ -149,7 +140,7 @@ class PointTest extends \PHPUnit_Framework_TestCase
      * Test bad string parameters - longitude degrees greater than 180
      *
      * @expectedException        \CrEOF\Spatial\Exception\InvalidValueException
-     * @expectedExceptionMessage [Range Error] Error: Degrees out of range -180 to 180 in value "190:56:55W"
+     * @expectedExceptionMessage 190:56:55W is not a valid coordinate value.
      */
     public function testBadLongitudeDegrees()
     {
@@ -160,7 +151,7 @@ class PointTest extends \PHPUnit_Framework_TestCase
      * Test bad string parameters - longitude minutes greater than 59
      *
      * @expectedException        \CrEOF\Spatial\Exception\InvalidValueException
-     * @expectedExceptionMessage [Range Error] Error: Minutes greater than 60 in value "108:62:55W"
+     * @expectedExceptionMessage 108:62:55W is not a valid coordinate value.
      */
     public function testBadLongitudeMinutes()
     {
@@ -171,7 +162,7 @@ class PointTest extends \PHPUnit_Framework_TestCase
      * Test bad string parameters - longitude seconds greater than 59
      *
      * @expectedException        \CrEOF\Spatial\Exception\InvalidValueException
-     * @expectedExceptionMessage [Range Error] Error: Seconds greater than 60 in value "108:53:94W"
+     * @expectedExceptionMessage 108:53:94W is not a valid coordinate value.
      */
     public function testBadLongitudeSeconds()
     {
@@ -227,47 +218,5 @@ class PointTest extends \PHPUnit_Framework_TestCase
     public function testPointWrongArgumentTypes()
     {
         new Point(array(), array(), '1234');
-    }
-
-    /**
-     * Test bad string parameters - No parameters
-     *
-     * @expectedException        \CrEOF\Spatial\Exception\InvalidValueException
-     * @expectedExceptionMessage Invalid parameters passed to CrEOF\Spatial\PHP\Types\Geometry\Point::__construct:
-     */
-    public function testMissingArguments()
-    {
-        new Point();
-    }
-
-
-    /**
-     * Test bad string parameters - Two invalid parameters
-     *
-     * @expectedException        \CrEOF\Spatial\Exception\InvalidValueException
-     * @expectedExceptionMessage Invalid parameters passed to CrEOF\Spatial\PHP\Types\Geometry\Point::__construct: "", ""
-     */
-    public function testTwoInvalidArguments()
-    {
-        new Point(null, null);
-    }
-
-    /**
-     * Test bad string parameters - More than 3 parameters
-     *
-     * @expectedException        \CrEOF\Spatial\Exception\InvalidValueException
-     * @expectedExceptionMessage Invalid parameters passed to CrEOF\Spatial\PHP\Types\Geometry\Point::__construct: "1", "2", "3", "4", "", "5"
-     */
-    public function testUnusedArguments()
-    {
-        new Point(1, 2, 3, 4, null, 5);
-    }
-
-    public function testJson()
-    {
-        $expected = '{"type":"Point","coordinates":[5,5]}';
-        $point = new Point(array(5, 5));
-
-        $this->assertEquals($expected, $point->toJson());
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015 Derek J. Lambert
+ * Copyright (C) 2012 Derek J. Lambert
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,12 @@
  * SOFTWARE.
  */
 
-namespace CrEOF\Spatial\Tests\ORM\Query\AST\Functions\PostgreSql;
+namespace CrEOF\Spatial\Tests\ORM\Functions\PostgreSql;
 
 use CrEOF\Spatial\PHP\Types\Geometry\LineString;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use CrEOF\Spatial\Tests\Fixtures\LineStringEntity;
-use CrEOF\Spatial\Tests\OrmTestCase;
+use CrEOF\Spatial\Tests\OrmTest;
 use Doctrine\ORM\Query;
 
 /**
@@ -35,15 +35,14 @@ use Doctrine\ORM\Query;
  * @author  Derek J. Lambert <dlambert@dereklambert.com>
  * @license http://dlambert.mit-license.org MIT
  *
+ * @group postgresql
  * @group dql
  */
-class STStartPointTest extends OrmTestCase
+class STStartPointTest extends OrmTest
 {
     protected function setUp()
     {
-        $this->usesEntity(self::LINESTRING_ENTITY);
-        $this->supportsPlatform('postgresql');
-
+        $this->useEntity('linestring');
         parent::setUp();
     }
 
@@ -60,11 +59,11 @@ class STStartPointTest extends OrmTestCase
         $entity1 = new LineStringEntity();
 
         $entity1->setLineString($lineString1);
-        $this->getEntityManager()->persist($entity1);
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
+        $this->_em->persist($entity1);
+        $this->_em->flush();
+        $this->_em->clear();
 
-        $query = $this->getEntityManager()->createQuery('SELECT ST_AsText(ST_StartPoint(l.lineString)) FROM CrEOF\Spatial\Tests\Fixtures\LineStringEntity l');
+        $query = $this->_em->createQuery('SELECT ST_AsText(ST_StartPoint(l.lineString)) FROM CrEOF\Spatial\Tests\Fixtures\LineStringEntity l');
 
         $result = $query->getResult();
 
@@ -89,18 +88,18 @@ class STStartPointTest extends OrmTestCase
         $entity1 = new LineStringEntity();
 
         $entity1->setLineString($lineString1);
-        $this->getEntityManager()->persist($entity1);
+        $this->_em->persist($entity1);
 
         $entity2 = new LineStringEntity();
 
         $entity2->setLineString($lineString2);
-        $this->getEntityManager()->persist($entity2);
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
+        $this->_em->persist($entity2);
+        $this->_em->flush();
+        $this->_em->clear();
 
-        $query = $this->getEntityManager()->createQuery('SELECT l FROM CrEOF\Spatial\Tests\Fixtures\LineStringEntity l WHERE ST_StartPoint(l.lineString) = ST_GeomFromText(:p1)');
+        $query = $this->_em->createQuery('SELECT l FROM CrEOF\Spatial\Tests\Fixtures\LineStringEntity l WHERE ST_StartPoint(l.lineString) = ST_GeomFromText(:p1)');
 
-        $query->setParameter('p1', 'POINT(0 0)', 'string');
+        $query->setParameter('p1', new Point(0, 0), 'point');
 
         $result = $query->getResult();
 
@@ -126,18 +125,18 @@ class STStartPointTest extends OrmTestCase
         $entity1 = new LineStringEntity();
 
         $entity1->setLineString($lineString1);
-        $this->getEntityManager()->persist($entity1);
+        $this->_em->persist($entity1);
 
         $entity2 = new LineStringEntity();
 
         $entity2->setLineString($lineString2);
-        $this->getEntityManager()->persist($entity2);
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
+        $this->_em->persist($entity2);
+        $this->_em->flush();
+        $this->_em->clear();
 
-        $query = $this->getEntityManager()->createQuery('SELECT l FROM CrEOF\Spatial\Tests\Fixtures\LineStringEntity l WHERE ST_StartPoint(l.lineString) = ST_StartPoint(ST_GeomFromText(:p1))');
+        $query = $this->_em->createQuery('SELECT l FROM CrEOF\Spatial\Tests\Fixtures\LineStringEntity l WHERE ST_StartPoint(l.lineString) = ST_StartPoint(ST_GeomFromText(:p1))');
 
-        $query->setParameter('p1', 'LINESTRING(3 3, 4 15, 5 22)', 'string');
+        $query->setParameter('p1', $lineString2, 'linestring');
 
         $result = $query->getResult();
 

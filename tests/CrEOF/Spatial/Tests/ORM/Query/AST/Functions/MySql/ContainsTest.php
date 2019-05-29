@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015 Derek J. Lambert
+ * Copyright (C) 2012 Derek J. Lambert
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +21,13 @@
  * SOFTWARE.
  */
 
-namespace CrEOF\Spatial\Tests\ORM\Query\AST\Functions\MySql;
+namespace CrEOF\Spatial\Tests\ORM\Functions\MySql;
 
 use CrEOF\Spatial\PHP\Types\Geometry\LineString;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use CrEOF\Spatial\PHP\Types\Geometry\Polygon;
 use CrEOF\Spatial\Tests\Fixtures\PolygonEntity;
-use CrEOF\Spatial\Tests\OrmTestCase;
+use CrEOF\Spatial\Tests\OrmTest;
 use Doctrine\ORM\Query;
 
 /**
@@ -36,16 +36,15 @@ use Doctrine\ORM\Query;
  * @author  Derek J. Lambert <dlambert@dereklambert.com>
  * @license http://dlambert.mit-license.org MIT
  *
+ * @group mysql
  * @group dql
  */
-class ContainsTest extends OrmTestCase
+class ContainsTest extends OrmTest
 {
     protected function setUp()
     {
-        $this->usesEntity(self::POLYGON_ENTITY);
-        $this->usesType('point');
-        $this->supportsPlatform('mysql');
-
+        $this->useEntity('polygon');
+        $this->useType('point');
         parent::setUp();
     }
 
@@ -71,18 +70,18 @@ class ContainsTest extends OrmTestCase
         $entity1 = new PolygonEntity();
 
         $entity1->setPolygon(new Polygon(array($lineString1)));
-        $this->getEntityManager()->persist($entity1);
+        $this->_em->persist($entity1);
 
         $entity2 = new PolygonEntity();
 
         $entity2->setPolygon(new Polygon(array($lineString2)));
-        $this->getEntityManager()->persist($entity2);
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
+        $this->_em->persist($entity2);
+        $this->_em->flush();
+        $this->_em->clear();
 
-        $query  = $this->getEntityManager()->createQuery('SELECT p, Contains(p.polygon, GeomFromText(:p1)) FROM CrEOF\Spatial\Tests\Fixtures\PolygonEntity p');
+        $query = $this->_em->createQuery('SELECT p, Contains(p.polygon, GeomFromText(:p1)) FROM CrEOF\Spatial\Tests\Fixtures\PolygonEntity p');
 
-        $query->setParameter('p1', 'POINT(2 2)', 'string');
+        $query->setParameter('p1', new Point(2, 2), 'point');
 
         $result = $query->getResult();
 
@@ -115,29 +114,29 @@ class ContainsTest extends OrmTestCase
         $entity1 = new PolygonEntity();
 
         $entity1->setPolygon(new Polygon(array($lineString1)));
-        $this->getEntityManager()->persist($entity1);
+        $this->_em->persist($entity1);
 
         $entity2 = new PolygonEntity();
 
         $entity2->setPolygon(new Polygon(array($lineString1, $lineString2)));
-        $this->getEntityManager()->persist($entity2);
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
+        $this->_em->persist($entity2);
+        $this->_em->flush();
+        $this->_em->clear();
 
-        $query  = $this->getEntityManager()->createQuery('SELECT p FROM CrEOF\Spatial\Tests\Fixtures\PolygonEntity p WHERE Contains(p.polygon, GeomFromText(:p1)) = 1');
+        $query = $this->_em->createQuery('SELECT p FROM CrEOF\Spatial\Tests\Fixtures\PolygonEntity p WHERE Contains(p.polygon, GeomFromText(:p1)) = 1');
 
-        $query->setParameter('p1', 'POINT(6 6)', 'string');
+        $query->setParameter('p1', new Point(6, 6), 'point');
 
         $result = $query->getResult();
 
         $this->assertCount(2, $result);
         $this->assertEquals($entity1, $result[0]);
         $this->assertEquals($entity2, $result[1]);
-        $this->getEntityManager()->clear();
+        $this->_em->clear();
 
-        $query  = $this->getEntityManager()->createQuery('SELECT p FROM CrEOF\Spatial\Tests\Fixtures\PolygonEntity p WHERE Contains(p.polygon, GeomFromText(:p1)) = 1');
+        $query = $this->_em->createQuery('SELECT p FROM CrEOF\Spatial\Tests\Fixtures\PolygonEntity p WHERE Contains(p.polygon, GeomFromText(:p1)) = 1');
 
-        $query->setParameter('p1', 'POINT(2 2)', 'string');
+        $query->setParameter('p1', new Point(2, 2), 'point');
 
         $result = $query->getResult();
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015 Derek J. Lambert
+ * Copyright (C) 2012 Derek J. Lambert
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,13 @@
  * SOFTWARE.
  */
 
-namespace CrEOF\Spatial\Tests\ORM\Query\AST\Functions\PostgreSql;
+namespace CrEOF\Spatial\Tests\ORM\Functions\PostgreSql;
 
+use CrEOF\Spatial\DBAL\Types\Utils;
 use CrEOF\Spatial\PHP\Types\Geometry\LineString;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use CrEOF\Spatial\Tests\Fixtures\LineStringEntity;
-use CrEOF\Spatial\Tests\OrmTestCase;
+use CrEOF\Spatial\Tests\OrmTest;
 use Doctrine\ORM\Query;
 
 /**
@@ -35,15 +36,14 @@ use Doctrine\ORM\Query;
  * @author  Derek J. Lambert <dlambert@dereklambert.com>
  * @license http://dlambert.mit-license.org MIT
  *
+ * @group postgresql
  * @group dql
  */
-class STAsBinaryTest extends OrmTestCase
+class STAsBinaryTest extends OrmTest
 {
     protected function setUp()
     {
-        $this->usesEntity(self::LINESTRING_ENTITY);
-        $this->supportsPlatform('postgresql');
-
+        $this->useEntity('linestring');
         parent::setUp();
     }
 
@@ -65,19 +65,20 @@ class STAsBinaryTest extends OrmTestCase
         $entity1 = new LineStringEntity();
 
         $entity1->setLineString(new LineString($lineString1));
-        $this->getEntityManager()->persist($entity1);
+        $this->_em->persist($entity1);
 
         $entity2 = new LineStringEntity();
 
         $entity2->setLineString(new LineString($lineString2));
-        $this->getEntityManager()->persist($entity2);
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
+        $this->_em->persist($entity2);
+        $this->_em->flush();
+        $this->_em->clear();
 
-        $query  = $this->getEntityManager()->createQuery('SELECT ST_AsBinary(l.lineString) FROM CrEOF\Spatial\Tests\Fixtures\LineStringEntity l');
+        $query = $this->_em->createQuery('SELECT ST_AsBinary(l.lineString) FROM CrEOF\Spatial\Tests\Fixtures\LineStringEntity l');
+
         $result = $query->getResult();
 
-        $this->assertEquals('010200000003000000000000000000000000000000000000000000000000000040000000000000004000000000000014400000000000001440', bin2hex(stream_get_contents($result[0][1])));
-        $this->assertEquals('0102000000030000000000000000000840000000000000084000000000000010400000000000002e4000000000000014400000000000003640', bin2hex(stream_get_contents($result[1][1])));
+        $this->assertEquals('010200000003000000000000000000000000000000000000000000000000000040000000000000004000000000000014400000000000001440', bin2hex(Utils::toBinary(stream_get_contents($result[0][1]))));
+        $this->assertEquals('0102000000030000000000000000000840000000000000084000000000000010400000000000002e4000000000000014400000000000003640', bin2hex(Utils::toBinary(stream_get_contents($result[1][1]))));
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015 Derek J. Lambert
+ * Copyright (C) 2012 Derek J. Lambert
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,56 +25,33 @@ namespace CrEOF\Spatial\Tests\DBAL\Types;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Query;
-use CrEOF\Spatial\Tests\OrmTestCase;
+use CrEOF\Spatial\Tests\OrmTest;
 
 /**
  * Doctrine schema related tests
  *
  * @author  Derek J. Lambert <dlambert@dereklambert.com>
  * @license http://dlambert.mit-license.org MIT
+ *
+ * @group result_processing
  */
-class SchemaTest extends OrmTestCase
+class SchemaTest extends OrmTest
 {
-    protected function setUp()
-    {
-        $this->usesEntity(self::GEOMETRY_ENTITY);
-        $this->usesEntity(self::POINT_ENTITY);
-        $this->usesEntity(self::LINESTRING_ENTITY);
-        $this->usesEntity(self::POLYGON_ENTITY);
-        $this->usesEntity(self::MULTIPOLYGON_ENTITY);
-
-        if ($this->getPlatform()->getName() === 'postgresql') {
-            $this->usesEntity(self::GEOGRAPHY_ENTITY);
-            $this->usesEntity(self::GEO_POINT_SRID_ENTITY);
-            $this->usesEntity(self::GEO_LINESTRING_ENTITY);
-            $this->usesEntity(self::GEO_POLYGON_ENTITY);
-        }
-
-        parent::setUp();
-    }
-
     public function testDoctrineTypeMapping()
     {
-        $platform = $this->getPlatform();
-
         foreach ($this->getAllClassMetadata() as $metadata) {
             foreach ($metadata->getFieldNames() as $fieldName) {
-                $doctrineType  = $metadata->getTypeOfField($fieldName);
-                $type          = Type::getType($doctrineType);
-                $databaseTypes =  $type->getMappedDatabaseTypes($platform);
+                $fieldType = $metadata->getTypeOfField($fieldName);
 
-                foreach ($databaseTypes as $databaseType) {
-                    $typeMapping = $this->getPlatform()->getDoctrineTypeMapping($databaseType);
-
-                    $this->assertEquals($doctrineType, $typeMapping);
-                }
+                // Throws exception if mapping does not exist
+                $typeMapping = $this->getPlatform()->getDoctrineTypeMapping($fieldType);
             }
         }
     }
 
     public function testSchemaReverseMapping()
     {
-        $result = $this->getSchemaTool()->getUpdateSchemaSql($this->getAllClassMetadata(), true);
+        $result = $this->_schemaTool->getUpdateSchemaSql($this->getAllClassMetadata(), true);
 
         $this->assertCount(0, $result);
     }
@@ -86,8 +63,8 @@ class SchemaTest extends OrmTestCase
     {
         $metadata = array();
 
-        foreach (array_keys($this->getUsedEntityClasses()) as $entityClass) {
-            $metadata[] = $this->getEntityManager()->getClassMetadata($entityClass);
+        foreach ($this->getEntityClasses() as $entityClass) {
+            $metadata[] = $this->_em->getClassMetadata($entityClass);
         }
 
         return $metadata;
